@@ -10,7 +10,7 @@ pipeline GoodsTransportedByTrainPipeline {
         -> goodsRowDeleter
         -> goodsTableInterpreter
         -> goodsLoader;
-
+ 
     // Defining the blocks used
 
     block goodsExtractor oftype HttpExtractor {
