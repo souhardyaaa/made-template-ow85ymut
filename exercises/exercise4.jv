@@ -1,0 +1,179 @@
+pipeline TemperatureDataPipeline {
+
+    // pipeline structure
+
+
+
+    tempExt
+        -> tempZipArcIntp
+        -> tempFP
+        
+        -> tempTextFileIntp
+        -> tempCSVIntp
+        -> tempHW
+        -> tempIdHWriter
+        -> tempBatteryHWriter
+        -> tempPHWriter
+        -> tempModelHWriter
+        -> tempMonthHWriter
+        -> tempTabInterp
+        -> CelToFahrBatTempTransf
+        -> CelToFahrTransf;
+        
+
+        CelToFahrTransf
+        
+        -> tempLoad;
+
+
+
+    // Blocks below 
+
+
+    block tempZipArcIntp oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+
+
+
+    block tempTextFileIntp oftype TextFileInterpreter {
+        encoding: "latin2";
+    }
+
+
+
+
+    block tempFP oftype FilePicker {
+        path: "/data.csv";
+    }
+
+
+
+    block tempExt oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    }
+
+
+
+
+    block tempCSVIntp oftype CSVInterpreter {
+        delimiter: ";";
+    }
+
+
+
+    block tempIdHWriter oftype CellWriter {
+        at: cell A1;
+        write: ["id"];
+    }
+
+
+
+
+    block tempHW oftype CellWriter {
+        at: cell E1;
+        write: ["temperature"];
+    }
+
+
+
+
+    block tempPHWriter oftype CellWriter {
+        at: cell B1;
+        write: ["producer"];
+    }
+
+
+
+
+    block tempBatteryHWriter oftype CellWriter {
+        at: cell J1;
+        write: ["battery_temperature"];
+    }
+
+
+
+
+    block tempModelHWriter oftype CellWriter {
+        at: cell C1;
+        write: ["model"];
+    }
+
+
+
+
+    block tempMonthHWriter oftype CellWriter {
+        at: cell D1;
+        write: ["month"];
+    }
+
+
+
+
+    block CelToFahrTransf oftype TableTransformer {
+        inputColumns: ['temperature'];
+        outputColumn: 'temperature';
+        use: CelToFahr;
+    }
+
+
+
+
+    block CelToFahrBatTempTransf oftype TableTransformer {
+        inputColumns: ['battery_temperature'];
+        outputColumn: 'battery_temperature';
+        use: CelToFahr;
+    }
+
+
+
+
+    block tempTabInterp oftype TableInterpreter {
+        header: true;
+        columns: [
+            "id" oftype PosInt,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype integer,
+            "temperature" oftype decimal,
+            "battery_temperature" oftype decimal
+        ];
+    } 
+
+
+
+    block tempLoad oftype SQLiteLoader {
+        table: "temperatures";
+        file: "./temperatures.sqlite";
+    }    
+    
+
+
+
+
+
+    // value types below
+
+    valuetype PosInt oftype integer {
+        constraints: [IsPos];
+    }
+
+
+    // constraints below
+
+    constraint IsPos on integer :
+        value > 0;
+
+    //  transformers below
+
+    
+    transform CelToFahr {
+    from Celsius oftype decimal;
+    to Fahrenheit oftype decimal;
+
+    Fahrenheit: (Celsius * 9/5) + 32;
+    }
+
+ 
+}
