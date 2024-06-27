@@ -1,0 +1,85 @@
+pipeline GTFSStopsDataPipeline {
+
+    // Defining the pipeline structure 
+    gtfsStopsExtractor
+        -> gtfsStopsZipArchiveInterpreter
+        -> gtfsStopsFilePicker
+        -> gtfsStopsTextFileInterpreter
+        -> gtfsStopsCSVInterpreter
+        -> gtfsStopsColDeleter
+        -> gtfsStopsTableInterpreter
+        
+        -> gtfsStopsLoader;
+
+    // Defining the blocks below
+
+    block gtfsStopsZipArchiveInterpreter oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+
+    block gtfsStopsTextFileInterpreter oftype TextFileInterpreter {
+        encoding: "utf8";
+    }
+
+
+    block gtfsStopsFilePicker oftype FilePicker {
+        path: "/stops.txt";
+    }
+
+
+    block gtfsStopsExtractor oftype HttpExtractor {
+        url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+    }
+
+
+    block gtfsStopsCSVInterpreter oftype CSVInterpreter {
+        delimiter: ","; 
+        enclosing: '"'; 
+    }
+
+
+    block gtfsStopsColDeleter oftype ColumnDeleter {
+        delete: [
+            column A, column D, column H, column I, column J, column K, column L  
+        ];
+        }
+
+
+    block gtfsStopsTableInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "stop_id" oftype integer,
+            "stop_name" oftype text,
+            "stop_lat" oftype decimal,
+            "stop_lon" oftype decimal,
+            "zone_id" oftype ZoneValid
+        ];
+    }
+
+
+    block gtfsStopsLoader oftype SQLiteLoader {
+        table: "stops";
+        file: "./gtfs.sqlite";
+    }
+
+
+    
+
+    
+    // Defining the value types below
+
+    valuetype ZoneValid oftype integer {
+        constraints: [IsValid];
+    }
+
+
+   
+
+    // Defining the constraints below
+
+    constraint IsValid on integer :
+        value==1645;
+
+
+}
