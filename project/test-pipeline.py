@@ -1,124 +1,73 @@
 import os
+import unittest
 import pandas as pd
 import sqlite3
-import requests
-import webbrowser
+from unittest.mock import patch
+from project.pipeline import download_file, save_to_csv, save_to_sqlite
 
-# URLs for the datasets
-url1 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ten00124?format=TSV&compressed=false"
-url2 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sdg_13_10?format=TSV&compressed=false"
-url3 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/tps00128?format=TSV&compressed=false"
 
-# Data directory
-output_dir = "output"
-tsv_paths = {
-    "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.tsv"),
-    "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.tsv"),
-    "data3": os.path.join(output_dir, "deaths_by_pneumonia.tsv")
-}
-excel_paths = {
-    "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.xlsx"),
-    "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.xlsx"),
-    "data3": os.path.join(output_dir, "deaths_by_pneumonia.xlsx")
-}
-database_paths = {
-    "database1": os.path.join(output_dir, "final_energy_consumption_by_sector.db"),
-    "database2": os.path.join(output_dir, "net_greenhouse_gas_emissions.db"),
-    "database3": os.path.join(output_dir, "deaths_by_pneumonia.db")
-}
+class Test_Pipeline(unittest.TestCase):
+    def set_Up(self):
+        # Define mock data
+        self.mock_df = pd.DataFrame({
+            "column_1": [1, 2, 3],
+            "column_2": [4, 5, 6]
+        })
 
-# Creating output directory if it doesn't exist
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+        # Define file paths 
+        self.op_dir = "output"
+        self.csv_path = os.path.join(self.op_dir, "test_data.csv")
+        self.db_path = os.path.join(self.op_dir, "test_data.db")
 
-# Function to download and save files
-def download_file(url, file_path):
-    if not os.path.exists(file_path):
-        response = requests.get(url)
-        response.raise_for_status()
-        with open(file_path, 'wb') as file:
-            file.write(response.content)
-        print(f"Downloaded {file_path}")
-    else:
-        print(f"File {file_path} already exists. Skipping download.")
+        # Create output directory if it doesn't exist
+        if not os.path.exists(self.op_dir):
+            os.makedirs(self.op_dir)
 
-# Downloading the datasets
-print("Downloading datasets...")
-download_file(url1, tsv_paths["data1"])
-download_file(url2, tsv_paths["data2"])
-download_file(url3, tsv_paths["data3"])
-print("Download complete.")
 
-# Reading the datasets into DataFrames
-print("Reading datasets into DataFrames...")
-energy_consumption = pd.read_csv(tsv_paths["data1"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
-greenhouse_emissions = pd.read_csv(tsv_paths["data2"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
-deaths = pd.read_csv(tsv_paths["data3"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
+    @patch("pipeline.pipeline.requests.get")
+    def test_dwnld_file(self, mock_get):
+        # Mock the response from requests.get
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.content = b"mock content"
 
-# Filling missing values with 0
-print("Filling missing values...")
-energy_consumption.fillna(0, inplace=True)
-greenhouse_emissions.fillna(0, inplace=True)
-deaths.fillna(0, inplace=True)
+        # Test downloading a file
+        download_file("http://example.com/mockfile", self.csv_path)
+        self.assertTrue(os.path.exists(self.csv_path))
 
-# Cleaning column names (strip and lowercase)
-print("Cleaning column names...")
-energy_consumption.columns = [col.strip().lower() for col in energy_consumption.columns]
-greenhouse_emissions.columns = [col.strip().lower() for col in greenhouse_emissions.columns]
-deaths.columns = [col.strip().lower() for col in deaths.columns]
 
-# Saving cleaned DataFrames to Excel files
-def save_to_excel(df, excel_path):
-    if os.path.exists(excel_path):
-        os.remove(excel_path)
-    df.to_excel(excel_path, index=False)
-    print(f"Data saved to {excel_path}")
+    def test_save_to_csv(self):
+        # Test saving DataFrame to CSV
+        save_to_csv(self.mock_df, self.csv_path)
+        self.assertTrue(os.path.exists(self.csv_path))
 
-# Saving cleaned DataFrames as Excel files
-save_to_excel(energy_consumption, excel_paths["data1"])
-save_to_excel(greenhouse_emissions, excel_paths["data2"])
-save_to_excel(deaths, excel_paths["data3"])
+        # Read the saved CSV and compare with the original DataFrame
+        df_read = pd.read_csv(self.csv_path)
+        pd.testing.assert_frame_equal(df_read, self.mock_df)
 
-print("Data cleaning and saving completed.")
 
-# Saving DataFrames to SQLite databases
-def save_to_sqlite(df, db_path, table_name):
-    if os.path.exists(db_path):
-        os.remove(db_path)
-    conn = sqlite3.connect(db_path)
-    df.to_sql(table_name, conn, if_exists="replace", index=False)
-    conn.close()
-    print(f"Data saved to {db_path} in table {table_name}")
+    def test_save_to_sqlite(self):
+        # Test saving DataFrame to SQLite
+        save_to_sqlite(self.mock_df, self.db_path, "test_table")
+        self.assertTrue(os.path.exists(self.db_path))
 
-save_to_sqlite(energy_consumption, database_paths["database1"], "final_energy_consumption_by_sector")
-save_to_sqlite(greenhouse_emissions, database_paths["database2"], "net_greenhouse_gas_emissions")
-save_to_sqlite(deaths, database_paths["database3"], "deaths_by_pneumonia")
+        # Read the saved data from SQLite and compare with the original DataFrame
+        conn = sqlite3.connect(self.db_path)
+        df_read = pd.read_sql("SELECT * FROM test_table", conn)
+        conn.close()
+        pd.testing.assert_frame_equal(df_read, self.mock_df)
 
-print("Data pipeline execution completed.")
 
-# Opening files with specified names
-def open_files(file_paths):
-    for file_path, display_name in file_paths.items():
-        if os.path.exists(file_path):
-            print(f"Opening {display_name} at {file_path}")
-            webbrowser.open(f'file://{os.path.abspath(file_path)}')
-        else:
-            print(f"{file_path} does not exist.")
+    def tear_Down(self):
+        # Remove test files after each test
+        if os.path.exists(self.csv_path):
+            os.remove(self.csv_path)
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
 
-# Opening Excel files and SQLite databases with different names
-excel_files = {
-    excel_paths["data1"]: "Final Energy Consumption by Sector Data",
-    excel_paths["data2"]: "Net Greenhouse Gas Emissions Data",
-    excel_paths["data3"]: "Deaths caused by Pneumonia"
-}
-open_files(excel_files)
 
-sqlite_dbs = {
-    database_paths["database1"]: "Final Energy Consumption by Sector Database",
-    database_paths["database2"]: "Net Greenhouse Gas Emissions Database",
-    database_paths["database3"]: "Deaths caused by Pneumonia"
-}
-open_files(sqlite_dbs)
+
+if __name__ == "__main__":
+    unittest.main()
 
 if __name__ == "__main__":
     unittest.main()
