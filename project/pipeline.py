@@ -51,9 +51,9 @@ print("Download complete.")
 
 # Reading the datasets into DataFrames
 print("Reading datasets into DataFrames...")
-energy_consumption = pd.read_csv(tsv_paths["data1"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
-greenhouse_emissions = pd.read_csv(tsv_paths["data2"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
-deaths = pd.read_csv(tsv_paths["data3"], delimiter='\t', encoding='ISO-8859-1', error_bad_lines=False, warn_bad_lines=True)
+energy_consumption = pd.read_csv(tsv_paths["data1"], delimiter='\t', encoding='ISO-8859-1')
+greenhouse_emissions = pd.read_csv(tsv_paths["data2"], delimiter='\t', encoding='ISO-8859-1')
+deaths = pd.read_csv(tsv_paths["data3"], delimiter='\t', encoding='ISO-8859-1')
 
 # Filling missing values with 0
 print("Filling missing values...")
