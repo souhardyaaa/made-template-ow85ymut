@@ -10,7 +10,7 @@ url2 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sdg_13_10?
 url3 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/tps00128?format=TSV&compressed=false"
 
 # Data directory
-output_dir = "output"
+output_dir = "project/output"
 tsv_paths = {
     "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.tsv"),
     "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.tsv"),
