@@ -25,9 +25,9 @@ excel_paths = {
     "data3": os.path.join(output_dir, "deaths_by_pneumonia.xlsx")
 }
 database_paths = {
-    "database1": os.path.join(output_dir, "final_energy_consumption_by_sector.db"),
-    "database2": os.path.join(output_dir, "net_greenhouse_gas_emissions.db"),
-    "database3": os.path.join(output_dir, "deaths_by_pneumonia.db")
+    "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.db"),
+    "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.db"),
+    "data3": os.path.join(output_dir, "deaths_by_pneumonia.db")
 }
 
 # Creating output directory if it doesn't exist
