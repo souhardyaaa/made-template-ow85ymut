@@ -23,10 +23,8 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pandas requests openpyxl
 
-    - name: Make tests.sh executable  # Make tests.sh executable
-      run: chmod +x ./project/tests.sh
+    - name: Make test.sh executable  # Make test.sh executable
+      run: chmod +x ./test.sh
 
-    - name: Run tests  # Navigate to project folder and run tests.sh script
-      run: |
-        cd project
-        ./tests.sh 
+    - name: Run tests  # Run the test.sh script
+      run: ./test.sh
