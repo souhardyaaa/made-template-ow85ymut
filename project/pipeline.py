@@ -5,12 +5,9 @@ import requests
 import webbrowser
 
 # URLs for the datasets
-
-urls = {
-    "data1": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ten00124?format=TSV&compressed=false",
-    "data2": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sdg_13_10?format=TSV&compressed=false",
-    "data3": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/tps00128?format=TSV&compressed=false"
-}
+url1 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ten00124?format=TSV&compressed=false"
+url2 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sdg_13_10?format=TSV&compressed=false"
+url3 = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/tps00128?format=TSV&compressed=false"
 
 # Data directory
 output_dir = "output"
@@ -25,9 +22,9 @@ excel_paths = {
     "data3": os.path.join(output_dir, "deaths_by_pneumonia.xlsx")
 }
 database_paths = {
-    "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.db"),
-    "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.db"),
-    "data3": os.path.join(output_dir, "deaths_by_pneumonia.db")
+    "database1": os.path.join(output_dir, "final_energy_consumption_by_sector.db"),
+    "database2": os.path.join(output_dir, "net_greenhouse_gas_emissions.db"),
+    "database3": os.path.join(output_dir, "deaths_by_pneumonia.db")
 }
 
 # Creating output directory if it doesn't exist
@@ -122,4 +119,3 @@ sqlite_dbs = {
     database_paths["database3"]: "Deaths caused by Pneumonia"
 }
 open_files(sqlite_dbs)
-
