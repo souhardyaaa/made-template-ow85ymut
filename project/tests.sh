@@ -2,20 +2,20 @@
 
 # Defining the output files expected from the pipeline
 OUTPUT_FILES=(
-    "projects/output/final_energy_consumption_by_sector.tsv"
-    "projects/output/net_greenhouse_gas_emissions.tsv"
-    "projects/output/deaths_by_pneumonia.tsv"
-    "projects/output/final_energy_consumption_by_sector.xlsx"
-    "projects/output/net_greenhouse_gas_emissions.xlsx"
-    "projects/output/deaths_by_pneumonia.xlsx"
-    "projects/output/final_energy_consumption_by_sector.db"
-    "projects/output/net_greenhouse_gas_emissions.db"
-    "projects/output/deaths_by_pneumonia.db"
+    "project/output/final_energy_consumption_by_sector.tsv"
+    "project/output/net_greenhouse_gas_emissions.tsv"
+    "project/output/deaths_by_pneumonia.tsv"
+    "project/output/final_energy_consumption_by_sector.xlsx"
+    "project/output/net_greenhouse_gas_emissions.xlsx"
+    "project/output/deaths_by_pneumonia.xlsx"
+    "project/output/final_energy_consumption_by_sector.db"
+    "project/output/net_greenhouse_gas_emissions.db"
+    "project/output/deaths_by_pneumonia.db"
 )
 
 # Run the data pipeline
 echo "Running the data pipeline..."
-python3 projects/pipeline.py
+python3 project/pipeline.py
 
 # Check if the output files are created
 all_files_exist=true
