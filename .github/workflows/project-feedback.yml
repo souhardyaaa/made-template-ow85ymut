@@ -24,7 +24,7 @@ jobs:
         python -m pip install pandas requests openpyxl pysqlite3
 
     - name: Make tests.sh executable  # Make tests.sh executable
-      run: chmod +x ./projects/tests.sh
+      run: chmod +x ./project/tests.sh
 
     - name: Run tests  # Run the tests.sh script
-      run: ./projects/tests.sh
+      run: ./project/tests.sh
