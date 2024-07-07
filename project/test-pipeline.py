@@ -114,8 +114,5 @@ class TestDataPipeline(unittest.TestCase):
 
         self.assertFalse(df_from_db.empty)
 
-if __name__ == '__main__':
-    unittest.main()
-
 if __name__ == "__main__":
     unittest.main()
