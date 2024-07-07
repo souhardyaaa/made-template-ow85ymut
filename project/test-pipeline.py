@@ -11,7 +11,7 @@ urls = {
     "deaths": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/tps00128?format=TSV&compressed=false"
 }
 
-output_dir = "output"
+output_dir = "project/output"
 tsv_paths = {
     "data1": os.path.join(output_dir, "final_energy_consumption_by_sector.tsv"),
     "data2": os.path.join(output_dir, "net_greenhouse_gas_emissions.tsv"),
@@ -42,9 +42,9 @@ class TestDataPipeline(unittest.TestCase):
             self.download_file(url, tsv_paths[key])
         
         # Load datasets into DataFrames
-        self.energy_consumption = pd.read_csv(tsv_paths["energy_consumption"], delimiter='\t', encoding='ISO-8859-1')
-        self.greenhouse_emissions = pd.read_csv(tsv_paths["greenhouse_emissions"], delimiter='\t', encoding='ISO-8859-1')
-        self.deaths = pd.read_csv(tsv_paths["deaths"], delimiter='\t', encoding='ISO-8859-1')
+        self.energy_consumption = pd.read_csv(tsv_paths["data1"], delimiter='\t', encoding='ISO-8859-1')
+        self.greenhouse_emissions = pd.read_csv(tsv_paths["data2"], delimiter='\t', encoding='ISO-8859-1')
+        self.deaths = pd.read_csv(tsv_paths["data3"], delimiter='\t', encoding='ISO-8859-1')
 
     def test_fill_missing_values(self):
         # Test filling missing values with 0
@@ -106,9 +106,9 @@ class TestDataPipeline(unittest.TestCase):
     def test_save_to_sqlite(self):
         # Test saving DataFrame to SQLite database
         transposed_df = self.transpose_and_set_index(self.energy_consumption)
-        self.save_to_sqlite(transposed_df, database_paths["energy_consumption"], "final_energy_consumption_by_sector")
+        self.save_to_sqlite(transposed_df, database_paths["data1"], "final_energy_consumption_by_sector")
 
-        conn = sqlite3.connect(database_paths["energy_consumption_by_sector"])
+        conn = sqlite3.connect(database_paths["data1"])
         df_from_db = pd.read_sql_query("SELECT * FROM final_energy_consumption_by_sector", conn)
         conn.close()
 
