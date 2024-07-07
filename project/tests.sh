@@ -15,7 +15,7 @@ OUTPUT_FILES=(
 
 # Run the data pipeline
 echo "Running the data pipeline..."
-python3 project/pipeline.py
+bash project/pipeline.sh
 
 # Check if the output files are created
 all_files_exist=true
