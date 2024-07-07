@@ -24,7 +24,7 @@ jobs:
         python -m pip install pandas requests openpyxl
 
     - name: Make test.sh executable  # Make test.sh executable
-      run: chmod +x ./test.sh
+      run: chmod +x ./tests.sh
 
     - name: Run tests  # Run the test.sh script
       run: ./tests.sh
